@@ -1,0 +1,80 @@
+C51 COMPILER V8.05a   TIMER0                                                               12/23/2009 21:50:51 PAGE 1   
+
+
+C51 COMPILER V8.05a, COMPILATION OF MODULE TIMER0
+OBJECT MODULE PLACED IN timer0.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE timer0.c DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          //*****************************************************************************
+   2          // TIMER0.C
+   3          // Funciones para el uso de los temporizadores/contadores del 8051/2
+   4          //*****************************************************************************
+   5          //#include <regx52.h>
+   6          #include <reg52.h>
+   7          #include <stdio.h>
+   8          
+   9          #define CARGA_INICIAL_T0        (0xdc00)
+  10          #define TIC_100MS                       10
+  11          
+  12          bit tic100ms;
+  13          
+  14          void InitTimer0( void );
+  15          
+  16          /*---[ InitTimer0() ]----------------------------------------------------------
+  17          ** Setup timer 0.
+  18          ** ¡NO MODIFICAR! 
+  19          */
+  20          void InitTimer0( void )
+  21          {
+  22   1          TMOD &= 0xF0;
+  23   1          TMOD |= 0x01;       // TMOD: timer 0, mode 1, 16-bit without reload
+  24   1      
+  25   1          TR0 = 0;            // stop timer 0
+  26   1          TL0 = (CARGA_INICIAL_T0 & 0x00ff);          
+  27   1              TH0 = (CARGA_INICIAL_T0 >> 8);
+  28   1          TR0 = 1;            // start timer 0
+  29   1      }
+  30          
+  31          
+  32          /*---[ Timer0IRQ() ]-----------------------------------------------------------
+  33          ** Genera una interrupción por desborde de timer 0.
+  34          ** ¡NO MODIFICAR!
+  35          */
+  36          void Timer0IRQ( void ) interrupt 1
+  37          {
+  38   1              /* Realizar esta función, colocando el código que considere necesario */
+  39   1              static unsigned char tic;
+  40   1      
+  41   1          TR0 = 0;            // stop timer 0
+  42   1          TL0 = (CARGA_INICIAL_T0 & 0x00ff) + TL0;            
+  43   1              TH0 = (CARGA_INICIAL_T0 >> 8) + TH0;
+  44   1          TR0 = 1;            // start timer 0
+  45   1      
+  46   1              tic++;
+  47   1      
+  48   1              if( tic == TIC_100MS )
+  49   1              {
+  50   2                      tic = 0;
+  51   2                      tic100ms = 1;
+  52   2              }
+  53   1      }
+  54          
+  55                                                                          
+C51 COMPILER V8.05a   TIMER0                                                               12/23/2009 21:50:51 PAGE 2   
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     51    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      1    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

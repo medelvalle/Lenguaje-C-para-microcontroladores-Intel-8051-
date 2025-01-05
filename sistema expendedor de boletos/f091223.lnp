@@ -1,0 +1,7 @@
+"inte.obj",
+"serie_io.obj",
+"timer0.obj",
+"maqEstados.obj",
+"f091223.obj" 
+TO "f091223" 
+RAMSIZE(256) 

@@ -1,0 +1,173 @@
+C51 COMPILER V8.05a   MAQESTADOS                                                           12/23/2009 21:50:52 PAGE 1   
+
+
+C51 COMPILER V8.05a, COMPILATION OF MODULE MAQESTADOS
+OBJECT MODULE PLACED IN maqEstados.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE maqEstados.c DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          //*****************************************************************************
+   2          // maqEstados.c
+   3          //*****************************************************************************
+   4          //#include <regx52.h>
+   5          #include <reg52.h>
+   6          
+   7          #define REPOSO                  100
+   8          #define VENTA                   101
+   9          #define ANULACION               102
+  10          
+  11          #define OFF             0
+  12          #define ON              1
+  13          #define FALSE   0
+  14          #define TRUE    1
+  15          
+  16          #define OFFSET_IMPRIMIR_BOLETO  0
+  17          #define OFFSET_SECCION                  1
+  18          #define OFFSET_NUMERO_BOLETO    2
+  19          #define OFFSET_VUELTO                   3
+  20          
+  21          #define TIME_OUT_VENTA          6000
+  22          #define TIME_OUT_LED            100
+  23          
+  24          extern bit flagNuevaVenta;
+  25          extern bit flagNuevaMoneda;
+  26          
+  27          void MaquinaEstados( unsigned short int * );
+  28          void InitMaqEstados( void );
+  29          unsigned short int LeerSeccion( void );
+  30          unsigned short int LeerMonedero( void );
+  31          
+  32          static char estado;
+  33          static unsigned short int numeroBoleto; //Contador de numero de boletos
+  34          
+  35          sbit LED_VENTA  = P1^0;
+  36          sbit REPOSICION = P1^1;
+  37          
+  38          code unsigned short int tarifaCentavos[]  = { 110, 120, 125 };
+  39          
+  40          /*---[ MaquinaEstados() ]------------------------------------------------------
+  41          ** Maquina de estado disparada por tic de 100 ms desde main().
+  42          ** Recibe:   puntero a arreglo para intercambio de datos con main()
+  43          ** Devuelve: nada 
+  44          */
+  45          void MaquinaEstados( unsigned short int *ptr )
+  46          {
+  47   1      
+  48   1        char seccion;
+  49   1        unsigned short int dineroIngresado;
+  50   1        unsigned int timeOut;
+  51   1        
+  52   1      
+  53   1        switch(estado)
+  54   1         {    
+  55   2               case REPOSO:
+C51 COMPILER V8.05a   MAQESTADOS                                                           12/23/2009 21:50:52 PAGE 2   
+
+  56   2               
+  57   2                      if (flagNuevaVenta==TRUE) 
+  58   2                        {
+  59   3                              flagNuevaVenta=FALSE;
+  60   3                              LED_VENTA=0; //prendo led
+  61   3                              ptr[OFFSET_SECCION] = LeerSeccion();
+  62   3                              seccion = ptr[OFFSET_SECCION];
+  63   3                              estado=VENTA;
+  64   3                              dineroIngresado=0;
+  65   3                              timeOut=0;
+  66   3                    }
+  67   2               break;
+  68   2      
+  69   2               case VENTA:
+  70   2              
+  71   2                      timeOut++;
+  72   2                      if (timeOut==TIME_OUT_VENTA)
+  73   2                        {
+  74   3                              dineroIngresado=0;
+  75   3                              estado=ANULACION;
+  76   3                              timeOut=0;
+  77   3                    }
+  78   2                      else if (flagNuevaMoneda==TRUE)
+  79   2                              {
+  80   3                                flagNuevaMoneda=FALSE;
+  81   3                                dineroIngresado=dineroIngresado+LeerMonedero();       /* (5) completar */
+  82   3                    if (dineroIngresado>=tarifaCentavos[seccion])
+  83   3                              { //vender boleto
+  84   4                                        numeroBoleto++;
+  85   4                                    LED_VENTA=1;
+  86   4                                    estado=REPOSO;
+  87   4                                        ptr[OFFSET_IMPRIMIR_BOLETO] = TRUE;
+  88   4                                        ptr[OFFSET_NUMERO_BOLETO]=numeroBoleto;
+  89   4                                        ptr[OFFSET_VUELTO]= dineroIngresado-tarifaCentavos[seccion];
+  90   4                                  }
+  91   3                              }
+  92   2               break;
+  93   2      
+  94   2               case ANULACION:
+  95   2                                      
+  96   2                  timeOut++;
+  97   2                      if (REPOSICION==0)
+  98   2                        {
+  99   3                          estado=REPOSO;
+ 100   3                              LED_VENTA=1;
+ 101   3                        }
+ 102   2                      else if (timeOut==TIME_OUT_LED)
+ 103   2                              {
+ 104   3                            timeOut=0;
+ 105   3                                if (LED_VENTA==1) 
+ 106   3                                      {
+ 107   4                                       LED_VENTA=0;
+ 108   4                                      }
+ 109   3                                else LED_VENTA=1;   
+ 110   3                      }
+ 111   2               break;
+ 112   2         }
+ 113   1       // return estado;
+ 114   1      }
+ 115          /*---[ InitMaqEstados() ]------------------------------------------------------
+ 116          ** Inicializa la máquina de estados
+ 117          */
+C51 COMPILER V8.05a   MAQESTADOS                                                           12/23/2009 21:50:52 PAGE 3   
+
+ 118          void InitMaqEstados( void )
+ 119          {
+ 120   1              estado = REPOSO;
+ 121   1              numeroBoleto = 0;
+ 122   1      }
+ 123          
+ 124          unsigned short int LeerSeccion( void )
+ 125          {
+ 126   1              switch( P0 & 0xe0 )
+ 127   1              {
+ 128   2                      case 0xc0:  return 1;
+ 129   2                      case 0xa0:  return 2;
+ 130   2                      case 0x60:  return 3;
+ 131   2                      default:        return 1;
+ 132   2              }
+ 133   1      }
+ 134          
+ 135          unsigned short int LeerMonedero( void )
+ 136          {
+ 137   1              switch( P0 & 0x1f )
+ 138   1              {
+ 139   2                      case 0x01:      return   5;
+ 140   2                      case 0x02:      return  10;
+ 141   2                      case 0x04:      return  25;
+ 142   2                      case 0x08:      return  50;
+ 143   2                      case 0x10:      return 100;
+ 144   2                      default:        return   0;
+ 145   2              }
+ 146   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    381    ----
+   CONSTANT SIZE    =      6    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3       8
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

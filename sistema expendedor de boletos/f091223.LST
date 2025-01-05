@@ -1,0 +1,94 @@
+C51 COMPILER V8.05a   F091223                                                              12/23/2009 21:52:57 PAGE 1   
+
+
+C51 COMPILER V8.05a, COMPILATION OF MODULE F091223
+OBJECT MODULE PLACED IN f091223.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE f091223.c DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          //*****************************************************************************
+   2          // main.c
+   3          //
+   4          // Programacion aplicada en lenguaje de alto nivel
+   5          //*****************************************************************************
+   6          #include <reg52.h>
+   7          #include <stdio.h>
+   8          
+   9          #define OFFSET_IMPRIMIR_BOLETO  0
+  10          #define OFFSET_SECCION                  1
+  11          #define OFFSET_NUMERO_BOLETO    2
+  12          #define OFFSET_VUELTO                   3
+  13          
+  14          #define FALSE   0
+  15          #define TRUE    1
+  16          
+  17          extern void InitUart( void );
+  18          extern void InitTimer0( void );
+  19          extern void InitMaqEstados( void );
+  20          extern void MaquinaEstados( unsigned short int * );
+  21          
+  22          extern bit tic100ms;
+  23          
+  24          code char *precio[] = { "1.10" , "1.20" , "1.25" };
+  25          
+  26          void main( void );
+  27          
+  28          unsigned short int *pGlobal;
+  29           
+  30          //----------------------------------- main() ----------------------------------
+  31          void main(void)
+  32          {
+  33   1              unsigned short int intercambio[5];
+  34   1         
+  35   1              InitUart();
+  36   1              InitTimer0();
+  37   1              InitMaqEstados();
+  38   1      
+  39   1              IT0 = 1;                        
+  40   1              IT1 = 1;                        
+  41   1              ET0 = 1;
+  42   1              EX0 = 1;
+  43   1              EX1 = 1;
+  44   1              EA  = 1; 
+  45   1      
+  46   1      //--- Aqui debe inicializar variables, punteros globales y sistema interrupcion
+  47   1              /* (1) completar */
+  48   1      //--- Fin de inicializaciones
+  49   1      
+  50   1              while( 1 )
+  51   1              {
+  52   2                      if( TRUE == tic100ms )
+  53   2                      {
+  54   3                              tic100ms = FALSE;
+  55   3                              MaquinaEstados (pGlobal);
+C51 COMPILER V8.05a   F091223                                                              12/23/2009 21:52:57 PAGE 2   
+
+  56   3                              if (pGlobal[OFFSET_IMPRIMIR_BOLETO]== TRUE)
+  57   3                                {
+  58   4                                  intercambio[OFFSET_SECCION] = pGlobal[OFFSET_SECCION];
+  59   4                                      intercambio[OFFSET_NUMERO_BOLETO]=pGlobal[OFFSET_NUMERO_BOLETO];
+  60   4                                      intercambio[OFFSET_VUELTO]=pGlobal[OFFSET_VUELTO];
+  61   4                                      if (intercambio[OFFSET_SECCION] == 1) 
+  62   4                                      intercambio[OFFSET_IMPRIMIR_BOLETO]= *precio[0];
+  63   4                                      if (intercambio[OFFSET_SECCION] == 2) 
+  64   4                                      intercambio[OFFSET_IMPRIMIR_BOLETO]= *precio[1];
+  65   4                                      if (intercambio[OFFSET_SECCION] == 3) 
+  66   4                                      intercambio[OFFSET_IMPRIMIR_BOLETO]= *precio[2];
+  67   4                                      printf ("sec:%bu  $%03bu",intercambio[*pGlobal[0]], intercambio[pGlobal[1]]);    
+*** ERROR C195 IN LINE 67 OF F091223.C: '*' illegal indirection
+  68   4                                      printf ("num:%03bu", intercambio[pGlobal[2]]);
+  69   4                                      printf ("vuelto: $0,%02bu", intercambio[pGlobal[3]]);
+  70   4                                }
+  71   3                               
+  72   3                              /* (2) completar
+  73   3                              ** Aqui debe llamar a la máquina de estados y realizar la impresion
+  74   3                              ** de Sección, Precio, Número de boleto y Vuelto, cuando reciba la
+  75   3                              ** orden de "imprimir"
+  76   3                              */
+  77   3                      }
+  78   2              }
+  79   1      }
+  80          
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  1 ERROR(S)

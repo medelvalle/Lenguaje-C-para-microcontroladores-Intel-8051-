@@ -1,0 +1,46 @@
+C51 COMPILER V8.05a   SERIE_IO                                                             12/23/2009 21:50:51 PAGE 1   
+
+
+C51 COMPILER V8.05a, COMPILATION OF MODULE SERIE_IO
+OBJECT MODULE PLACED IN serie_io.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE serie_io.c DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          //*********************************************************************
+   2          // SERIE_IO.C
+   3          // Funciones para utilizar la UART interna del 8051/2
+   4          // Funciones para recibir la programacion de las salidas, desde PC
+   5          //*********************************************************************
+   6          #include <reg52.h>
+   7          
+   8          void InitUart( void );
+   9          
+  10          /*---[ InitUart() ]----------------------------------------------------
+  11          ** Setup the serial port for 9600 baud at 11,059 MHz.
+  12          ** Baud rate generator: timer #1
+  13          */
+  14          void InitUart( void )
+  15          {
+  16   1          SCON = 0x50;           /* SCON: mode 1, 8-bit UART, enable receiver    */
+  17   1          TMOD|= 0x20;           /* TMOD: timer 1, mode 2, 8-bit reload          */
+  18   1          TH1  = 253;            /* TH1:  reload value for 9600 baud @ 11,059 MHz*/
+  19   1          TR1  = 1;              /* TR1:  timer 1 run                            */
+  20   1          TI   = 1;              /* TI:   set TI to send first char of UART      */
+  21   1      }
+  22          
+  23          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     14    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
