@@ -1,0 +1,63 @@
+C51 COMPILER V8.18   P101202                                                               06/28/2011 21:15:53 PAGE 1   
+
+
+C51 COMPILER V8.18, COMPILATION OF MODULE P101202
+NO OBJECT MODULE REQUESTED
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE p101202.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+*** WARNING C500 IN LINE 1 OF P101202.C: SERIAL NUMBER EXPIRED
+   1          //*****************************************************************************
+   2          // main.c
+   3          // NO MODIFICAR
+   4          //*****************************************************************************
+   5          #include <reg52.h>
+   6          
+   7          extern bit tic100ms;
+   8          extern char LeeTeclado( void );
+   9          extern void InitTimer0( void );
+  10          extern void InitUart( void );
+  11          extern void InitMaqEstados( void );
+  12          extern void MaqEstados( char );
+  13          
+  14          void main( void );
+  15          
+  16          //----------------------------------- main() ----------------------------------
+  17          void main( void )
+  18          {
+  19   1              char tecla;
+  20   1      
+  21   1              InitTimer0();
+  22   1              InitUart();
+  23   1              InitMaqEstados();
+  24   1      
+  25   1              ET0 = 1;
+  26   1              EA  = 1;
+  27   1      
+  28   1              while( 1 )
+  29   1              {
+  30   2                      if( tic100ms == 1 )
+  31   2                      {
+  32   3                              tic100ms = 0;
+  33   3      
+  34   3                              tecla = LeeTeclado();
+  35   3                              MaqEstados( tecla );
+  36   3                      }
+  37   2              }
+  38   1      }
+  39          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     28    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

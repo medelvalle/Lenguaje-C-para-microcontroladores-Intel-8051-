@@ -1,0 +1,75 @@
+C51 COMPILER V8.18   TIMER                                                                 06/28/2011 21:15:53 PAGE 1   
+
+
+C51 COMPILER V8.18, COMPILATION OF MODULE TIMER
+NO OBJECT MODULE REQUESTED
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE timer.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+*** WARNING C500 IN LINE 1 OF TIMER.C: SERIAL NUMBER EXPIRED
+   1          //*********************************************************************
+   2          // TIMER.C
+   3          // NO MODIFICAR
+   4          //*********************************************************************
+   5          #include <reg52.h>
+   6          
+   7          #define TIMER0_COUNT    47103   /* 20 ms @ 11,0592 MHz  */  
+   8          #define TIC_100MS               10              /* para simulador               */  
+   9          
+  10          void InitTimer0( void );
+  11          void TimerISR0( void ); // Atencion de interrupcion de timer 0
+  12                                  
+  13          bit tic100ms;
+  14          
+  15          /*---[ InitTimer0() ]--------------------------------------------------
+  16          ** Setup timer 0.
+  17          */
+  18          void InitTimer0( void )
+  19          {
+  20   1              /* NO modificar */
+  21   1              TMOD |= 0x01;           // TMOD: timer 0, mode 1, 16-bit sin auto recarga
+  22   1          TR0 = 0;                    // stop timer 0
+  23   1          TL0 = ( TIMER0_COUNT & 0x00FF );
+  24   1          TH0 = ( TIMER0_COUNT >> 8 );
+  25   1          TR0 = 1;                    // start timer 0
+  26   1              ET0 = 1;
+  27   1              EA  = 1;
+  28   1      }
+  29          
+  30          //---[ TimerISR0() ]---------------------------------------------------
+  31          void TimerISR0() interrupt 1
+  32          {
+  33   1              static unsigned char t;
+  34   1      
+  35   1          TR0 = 0;                    // stop timer 0
+  36   1          TL0 += ( TIMER0_COUNT & 0x00FF );
+  37   1          TH0 += ( TIMER0_COUNT >> 8 );
+  38   1          TR0 = 1;                    // start timer 0
+  39   1              TF0 = 0;
+  40   1      
+  41   1              t++;
+  42   1      
+  43   1              if( t >= TIC_100MS )    /* 100 ms */
+  44   1              {       
+  45   2                      t = 0;
+  46   2                      tic100ms = 1;
+  47   2              }
+  48   1      }
+  49          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     55    ----
+   CONSTANT SIZE    =   ----    ----
+C51 COMPILER V8.18   TIMER                                                                 06/28/2011 21:15:53 PAGE 2   
+
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      1    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

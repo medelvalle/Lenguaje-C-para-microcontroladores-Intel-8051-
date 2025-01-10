@@ -1,0 +1,72 @@
+C51 COMPILER V8.18   SERIE_IO                                                              06/28/2011 21:15:53 PAGE 1   
+
+
+C51 COMPILER V8.18, COMPILATION OF MODULE SERIE_IO
+NO OBJECT MODULE REQUESTED
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE serie_io.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+*** WARNING C500 IN LINE 1 OF SERIE_IO.C: SERIAL NUMBER EXPIRED
+   1          //*********************************************************************
+   2          // SERIE_IO.C
+   3          // NO MODIFICAR
+   4          //*********************************************************************
+   5          #include <reg52.h>
+   6          #include <stdio.h>
+   7          
+   8          void InitUart( void );
+   9          char LeeTeclado( void );
+  10          
+  11          /*---[ InitUart() ]----------------------------------------------------
+  12          ** Setup the serial port for 9600 baud at 11,059 MHz.
+  13          ** Baud rate generator: timer #1
+  14          */
+  15          void InitUart( void )
+  16          {
+  17   1          SCON = 0x50;           /* SCON: mode 1, 8-bit UART, enable receiver    */
+  18   1          TMOD|= 0x20;           /* TMOD: timer 1, mode 2, 8-bit reload          */
+  19   1          TH1  = 253;            /* TH1:  reload value for 9600 baud @ 11,059 MHz*/
+  20   1          TR1  = 1;              /* TR1:  timer 1 run                            */
+  21   1          TI   = 1;              /* TI:   set TI to send first char of UART      */
+  22   1      }
+  23          
+  24          /*---[ LeeTeclado() ]--------------------------------------------------
+  25          ** Devuelve el código ASCII de la tecla oprimida o null si no hay tecla
+  26          ** oprimida
+  27          ** Recibe:              nada
+  28          ** Devuelve:    código ASCII de la tecla/null si no hay tecla oprimida
+  29          */
+  30          char LeeTeclado( void )
+  31          {
+  32   1              char c;
+  33   1      
+  34   1              c = '\0';
+  35   1      
+  36   1              if( RI == 1 )
+  37   1              {
+  38   2                      c = getchar();
+  39   2                      putchar('\n');
+  40   2                      RI = 0;
+  41   2              }
+  42   1              
+  43   1              return c;
+  44   1      }
+  45          
+  46          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     35    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       1
+C51 COMPILER V8.18   SERIE_IO                                                              06/28/2011 21:15:53 PAGE 2   
+
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

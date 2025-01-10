@@ -1,0 +1,6 @@
+"timer.obj",
+"p101202.obj",
+"serie_io.obj",
+"maqEstados.obj" 
+TO "p101202" 
+RAMSIZE(256) 
